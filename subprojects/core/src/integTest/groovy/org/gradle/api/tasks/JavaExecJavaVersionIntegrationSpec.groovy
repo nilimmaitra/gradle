@@ -23,9 +23,9 @@ import org.gradle.test.preconditions.IntegTestPreconditions
 import spock.lang.Issue
 
 import static org.gradle.api.JavaVersion.VERSION_1_8
-import static org.gradle.api.JavaVersion.VERSION_1_9
+import static org.gradle.api.JavaVersion.VERSION_17
 
-@Requires([IntegTestPreconditions.MoreThanOneJava8HomeAvailable, IntegTestPreconditions.Java9HomeAvailable ])
+@Requires([IntegTestPreconditions.MoreThanOneJava8HomeAvailable, IntegTestPreconditions.Java17HomeAvailable ])
 class JavaExecJavaVersionIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {
@@ -62,7 +62,7 @@ class JavaExecJavaVersionIntegrationSpec extends AbstractIntegrationSpec {
         executedAndNotSkipped ":runHelloWorld"
 
         when:
-        executer.withJavaHome AvailableJavaHomes.getJdk(VERSION_1_9).javaHome
+        executer.withJavaHome AvailableJavaHomes.getJdk(VERSION_17).javaHome
         succeeds "runHelloWorld", "--info"
         then:
         executedAndNotSkipped ":runHelloWorld"

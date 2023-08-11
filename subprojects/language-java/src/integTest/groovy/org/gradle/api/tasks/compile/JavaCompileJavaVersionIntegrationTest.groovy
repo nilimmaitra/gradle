@@ -24,9 +24,9 @@ import org.gradle.test.preconditions.IntegTestPreconditions
 import org.gradle.util.internal.TextUtil
 
 import static org.gradle.api.JavaVersion.VERSION_1_8
-import static org.gradle.api.JavaVersion.VERSION_1_9
+import static org.gradle.api.JavaVersion.VERSION_17
 
-@Requires([IntegTestPreconditions.Java8HomeAvailable, IntegTestPreconditions.Java9HomeAvailable ])
+@Requires([IntegTestPreconditions.Java8HomeAvailable, IntegTestPreconditions.Java17HomeAvailable ])
 class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
 
     /**
@@ -37,6 +37,9 @@ class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
      */
     def setup() {
         executer.requireDaemon().requireIsolatedDaemons()
+        executer.beforeExecute {
+            noDeprecationChecks()
+        }
     }
 
     def "not up-to-date when default Java version changes"() {
@@ -44,8 +47,8 @@ class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
         buildFile << """
             apply plugin: "java"
 
-            sourceCompatibility = "1.6"
-            targetCompatibility = "1.6"
+            sourceCompatibility = "1.7"
+            targetCompatibility = "1.7"
         """
 
         and:
@@ -67,7 +70,7 @@ class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
         skipped ":compileJava"
 
         when:
-        executer.withJavaHome AvailableJavaHomes.getJdk(VERSION_1_9).javaHome
+        executer.withJavaHome AvailableJavaHomes.getJdk(VERSION_17).javaHome
         succeeds "compileJava", "--info"
         then:
         executedAndNotSkipped ":compileJava"
@@ -77,7 +80,7 @@ class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
     def "not up-to-date when java version for forking changes"() {
         given:
         def jdk8 = AvailableJavaHomes.getJdk(VERSION_1_8)
-        def jdk9 = AvailableJavaHomes.getJdk(VERSION_1_9)
+        def jdk9 = AvailableJavaHomes.getJdk(VERSION_17)
 
 
         buildFile << forkedJavaCompilation(jdk8)
@@ -114,8 +117,8 @@ class JavaCompileJavaVersionIntegrationTest extends AbstractIntegrationSpec {
         """
             apply plugin: "java"
 
-            sourceCompatibility = "1.6"
-            targetCompatibility = "1.6"
+            sourceCompatibility = "1.7"
+            targetCompatibility = "1.7"
 
             compileJava {
                 options.with {
