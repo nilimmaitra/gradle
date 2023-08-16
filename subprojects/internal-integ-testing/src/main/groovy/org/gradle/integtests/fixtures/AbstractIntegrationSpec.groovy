@@ -732,6 +732,13 @@ tmpdir is currently ${System.getProperty("java.io.tmpdir")}""")
         enableProblemsApiCheck = false
     }
 
+    def getProblems() {
+        if (!enableProblemsApiCheck) {
+            throw new IllegalStateException('Problems API check is not enabled')
+        }
+        return buildOperationsFixture.problems()
+    }
+
     /**
      * Generates a `repositories` block pointing to the standard maven repo fixture.
      *
