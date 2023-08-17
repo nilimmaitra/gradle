@@ -22,6 +22,8 @@ import org.gradle.api.problems.interfaces.ProblemBuilder;
 import org.gradle.api.problems.interfaces.ProblemBuilderDefiningLabel;
 import org.gradle.api.problems.interfaces.ProblemGroup;
 import org.gradle.internal.operations.BuildOperationProgressEventEmitter;
+import org.gradle.internal.service.scopes.Scope;
+import org.gradle.internal.service.scopes.ServiceScope;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -34,7 +36,8 @@ import static org.gradle.api.problems.interfaces.ProblemGroup.TYPE_VALIDATION_ID
 import static org.gradle.api.problems.interfaces.ProblemGroup.VERSION_CATALOG_ID;
 import static org.gradle.api.problems.interfaces.Severity.ERROR;
 
-public class DefaultProblems extends Problems {
+@ServiceScope(Scope.Global.class)
+public class DefaultProblems implements Problems {
     private final BuildOperationProgressEventEmitter buildOperationProgressEventEmitter;
 
     private final Map<String, ProblemGroup> problemGroups = new LinkedHashMap<>();
@@ -76,7 +79,6 @@ public class DefaultProblems extends Problems {
     @Override
     public void collectError(Problem problem) {
         buildOperationProgressEventEmitter.emitNowIfCurrent(problem);
-//        ProblemsProgressEventEmitterHolder.get().emitNowIfCurrent(problem);
     }
 
     @Override

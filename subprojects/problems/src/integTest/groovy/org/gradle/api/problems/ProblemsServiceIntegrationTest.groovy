@@ -27,18 +27,14 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
             import org.gradle.api.problems.interfaces.Problem
             import org.gradle.api.problems.interfaces.Severity
 
-            class ProblemReportingTask extends DefaultTask {
-                private Problems problems
+            abstract class ProblemReportingTask extends DefaultTask {
 
                 @Inject
-                ProblemReportingTask(Problems problems) {
-                    this.problems = problems
-                    println(problems)
-                }
+                protected abstract Problems getProblems();
 
                 @TaskAction
                 void run() {
-                    println("Reporting problem")
+                    println(problems.class.getName())
                     Problem problem = problems.createProblemBuilder()
                         .message("message")
                         .undocumented()
@@ -46,7 +42,7 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
                         .type("type")
                         .severity(Severity.ERROR)
                         .build()
-                    problems.collect(problem)
+                    problems.collectError(problem)
                 }
             }
 
@@ -54,7 +50,9 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
         """
 
         when:
-        def result = run("reportProblem")
+        def result = executer
+                .withTasks("reportProblem")
+                .run()
 
         then:
         this.collectedProblems.size() == 1

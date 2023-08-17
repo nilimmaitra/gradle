@@ -19,16 +19,12 @@ package org.gradle.api.problems;
 import org.gradle.api.Incubating;
 import org.gradle.api.problems.interfaces.Problem;
 import org.gradle.api.problems.interfaces.ProblemBuilder;
-import org.gradle.api.problems.interfaces.ProblemBuilderDefiningLabel;
+import org.gradle.api.problems.interfaces.ProblemBuilderDefiningMessage;
 import org.gradle.api.problems.interfaces.ProblemGroup;
-import org.gradle.internal.service.scopes.Scope;
-import org.gradle.internal.service.scopes.ServiceScope;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
-
-import static java.util.Collections.singleton;
 
 /**
  * Problems API service.
@@ -36,8 +32,7 @@ import static java.util.Collections.singleton;
  * @since 8.4
  */
 @Incubating
-@ServiceScope(Scope.Global.class)
-public abstract class Problems {
+public interface Problems {
 
     /**
      * A function that can be used to specify a {@link Problem} using a {@link ProblemBuilder}.
@@ -60,57 +55,29 @@ public abstract class Problems {
      * @since 8.4
      */
     @Incubating
-    public interface ProblemSpec {
+   interface ProblemSpec {
 
         @Nonnull
-        ProblemBuilder apply(ProblemBuilderDefiningLabel builder);
+        ProblemBuilder apply(ProblemBuilderDefiningMessage builder);
     }
 
-    private static Problems problemsService = new NoOpProblems();
+    ProblemBuilderDefiningMessage createProblemBuilder();
 
-    abstract public ProblemBuilderDefiningLabel createProblemBuilder();
-
-    abstract public void collectError(RuntimeException failure);
+    void collectError(RuntimeException failure);
 
 
-    abstract public void collectError(Problem problem);
+    void collectError(Problem problem);
 
-    abstract public void collectErrors(Collection<Problem> problem);
+    void collectErrors(Collection<Problem> problem);
 
-    abstract public @Nullable ProblemGroup getProblemGroup(String groupId);
+    @Nullable ProblemGroup getProblemGroup(String groupId);
 
-    abstract public RuntimeException throwing(ProblemSpec action);
+    RuntimeException throwing(ProblemSpec action);
 
-    abstract public RuntimeException rethrowing(RuntimeException e, ProblemSpec action);
+    RuntimeException rethrowing(RuntimeException e, ProblemSpec action);
 
-    abstract public ProblemGroup registerProblemGroup(String typeId);
+    ProblemGroup registerProblemGroup(String typeId);
 
-    abstract public ProblemGroup registerProblemGroup(ProblemGroup typeId);
-
-    protected static void collect(RuntimeException failure) {
-        problemsService.collectError(failure);
-    }
-
-    protected static void collect(Problem problem) {
-        problemsService.collectError(problem);
-    }
-
-    protected static ProblemBuilderDefiningLabel create() {
-        return problemsService.createProblemBuilder();
-    }
-
-    protected static RuntimeException throwing(ProblemBuilder problem, RuntimeException cause) {
-        problem.cause(cause);
-        return throwing(singleton(problem.build()), cause);
-    }
-
-    protected static RuntimeException throwing(Collection<Problem> problems, RuntimeException cause) {
-        collect(problems);
-        throw cause;
-    }
-
-    protected static void collect(Collection<Problem> problems) {
-        problemsService.collectErrors(problems);
-    }
+    ProblemGroup registerProblemGroup(ProblemGroup typeId);
 
 }
