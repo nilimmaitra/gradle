@@ -36,7 +36,7 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
                 void run() {
                     println(problems.class.getName())
                     Problem problem = problems.createProblemBuilder()
-                        .message("message")
+                        .label("label")
                         .undocumented()
                         .location("file", 1, 1)
                         .type("type")
