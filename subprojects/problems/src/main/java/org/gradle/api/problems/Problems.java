@@ -19,7 +19,7 @@ package org.gradle.api.problems;
 import org.gradle.api.Incubating;
 import org.gradle.api.problems.interfaces.Problem;
 import org.gradle.api.problems.interfaces.ProblemBuilder;
-import org.gradle.api.problems.interfaces.ProblemBuilderDefiningMessage;
+import org.gradle.api.problems.interfaces.ProblemBuilderDefiningLabel;
 import org.gradle.api.problems.interfaces.ProblemGroup;
 
 import javax.annotation.Nonnull;
@@ -58,10 +58,10 @@ public interface Problems {
    interface ProblemSpec {
 
         @Nonnull
-        ProblemBuilder apply(ProblemBuilderDefiningMessage builder);
+        ProblemBuilder apply(ProblemBuilderDefiningLabel builder);
     }
 
-    ProblemBuilderDefiningMessage createProblemBuilder();
+    ProblemBuilderDefiningLabel createProblemBuilder();
 
     void collectError(RuntimeException failure);
 

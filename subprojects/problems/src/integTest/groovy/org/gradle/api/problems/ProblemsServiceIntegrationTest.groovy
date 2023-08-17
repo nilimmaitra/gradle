@@ -50,13 +50,12 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
         """
 
         when:
-        def result = executer
-                .withTasks("reportProblem")
-                .run()
+        executer
+            .withTasks("reportProblem")
+            .run()
 
         then:
         this.collectedProblems.size() == 1
-        1 == 1
     }
 
 }
