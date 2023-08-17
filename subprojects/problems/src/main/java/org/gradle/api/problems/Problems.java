@@ -55,7 +55,7 @@ public interface Problems {
      * @since 8.4
      */
     @Incubating
-   interface ProblemSpec {
+    interface ProblemSpec {
 
         @Nonnull
         ProblemBuilder apply(ProblemBuilderDefiningLabel builder);
@@ -65,12 +65,12 @@ public interface Problems {
 
     void collectError(RuntimeException failure);
 
-
     void collectError(Problem problem);
 
     void collectErrors(Collection<Problem> problem);
 
-    @Nullable ProblemGroup getProblemGroup(String groupId);
+    @Nullable
+    ProblemGroup getProblemGroup(String groupId);
 
     RuntimeException throwing(ProblemSpec action);
 
