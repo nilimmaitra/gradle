@@ -25,6 +25,7 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
         enableProblemsApiCheck()
         buildFile << """
             import org.gradle.api.problems.interfaces.Problem
+            import org.gradle.api.problems.interfaces.Severity
 
             class ProblemReportingTask extends DefaultTask {
                 private Problems problems
@@ -32,6 +33,7 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
                 @Inject
                 ProblemReportingTask(Problems problems) {
                     this.problems = problems
+                    println(problems)
                 }
 
                 @TaskAction
@@ -42,7 +44,7 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
                         .undocumented()
                         .location("file", 1, 1)
                         .type("type")
-                        .severity(Severity.WARNING)
+                        .severity(Severity.ERROR)
                         .build()
                     problems.collect(problem)
                 }
@@ -55,7 +57,8 @@ class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
         def result = run("reportProblem")
 
         then:
-        this.problems.size() == 1
+        this.collectedProblems.size() == 1
+        1 == 1
     }
 
 }

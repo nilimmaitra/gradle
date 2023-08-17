@@ -732,7 +732,7 @@ tmpdir is currently ${System.getProperty("java.io.tmpdir")}""")
         enableProblemsApiCheck = false
     }
 
-    def getProblems() {
+    def getCollectedProblems() {
         if (!enableProblemsApiCheck) {
             throw new IllegalStateException('Problems API check is not enabled')
         }
