@@ -20,42 +20,85 @@ import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 
 class ProblemsServiceIntegrationTest extends AbstractIntegrationSpec {
 
+    def setup() {
+        enableProblemsApiCheck()
+        buildFile << """
+            tasks.register("reportProblem", ProblemReportingTask)
+        """
+    }
+
     def "can emit a problem"() {
         given:
-        enableProblemsApiCheck()
         buildFile << """
             import org.gradle.api.problems.interfaces.Problem
             import org.gradle.api.problems.interfaces.Severity
+            import org.gradle.internal.deprecation.Documentation
 
             abstract class ProblemReportingTask extends DefaultTask {
-
                 @Inject
                 protected abstract Problems getProblems();
 
                 @TaskAction
                 void run() {
-                    println(problems.class.getName())
                     Problem problem = problems.createProblemBuilder()
                         .label("label")
                         .undocumented()
-                        .location("file", 1, 1)
+                        .noLocation()
                         .type("type")
                         .severity(Severity.ERROR)
                         .build()
                     problems.collectError(problem)
                 }
             }
-
-            tasks.register("reportProblem", ProblemReportingTask)
-        """
+            """
 
         when:
-        executer
-            .withTasks("reportProblem")
-            .run()
+        run("reportProblem")
 
         then:
         this.collectedProblems.size() == 1
+        this.collectedProblems[0].details["label"] == "label"
     }
+
+    def "can emit a problem with user-manual documentation"() {
+        given:
+        buildFile << """
+            import org.gradle.api.problems.interfaces.Problem
+            import org.gradle.api.problems.interfaces.Severity
+            import org.gradle.internal.deprecation.Documentation
+
+            abstract class ProblemReportingTask extends DefaultTask {
+                @Inject
+                protected abstract Problems getProblems();
+
+                @TaskAction
+                void run() {
+                    Problem problem = problems.createProblemBuilder()
+                        .label("label")
+                        .documentedAt(
+                            Documentation.userManual("test-id", "test-section")
+                        )
+                        .noLocation()
+                        .type("type")
+                        .severity(Severity.ERROR)
+                        .build()
+                    problems.collectError(problem)
+                }
+            }
+            """
+
+        when:
+        run("reportProblem")
+
+        then:
+        this.collectedProblems.size() == 1
+        this.collectedProblems[0].details["documentationLink"] == [
+            "properties": [
+                "page": "test-id",
+                "section": "test-section"
+            ]
+        ]
+    }
+
 
 }
