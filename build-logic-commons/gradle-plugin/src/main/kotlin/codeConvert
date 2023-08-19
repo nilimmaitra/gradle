@@ -1,0 +1,46 @@
+// Add your existing Gradle plugin code above
+
+import org.mozilla.javascript.Parser
+import org.mozilla.javascript.ast.AstNode
+import org.mozilla.javascript.ast.NodeVisitor
+
+// Define the source code in JavaScript
+def javascriptCode = """
+function greet(name) {
+    console.log('Hello, ' + name + '!');
+}
+"""
+
+// Define the function to convert JavaScript code to Python
+def convertJavaScriptToPython(javascriptCode) {
+    def pythonCode = ""
+    def parser = new Parser()
+    def astRoot = parser.parse(javascriptCode, "", 1)
+
+    astRoot.visit(new NodeVisitor() {
+        @Override
+        boolean visit(AstNode node) {
+            // Convert JavaScript AST nodes to Python code
+            if (node is FunctionNode) {
+                pythonCode += "def ${node.functionName}("
+                // Handle function arguments
+                node.params.forEach { param ->
+                    pythonCode += "${param.toSource()}, "
+                }
+                pythonCode = pythonCode[0..-3] + "):\\n"
+                // Handle function body
+                node.getBody().getStatements().forEach { statement ->
+                    pythonCode += "    ${statement.toSource()}\\n"
+                }
+            } else if (node is ExpressionStatement) {
+                pythonCode += "    ${node.expression.toSource()}\\n"
+            }
+            return true
+        }
+    })
+    return pythonCode
+}
+
+// Convert JavaScript code to Python
+def pythonCode = convertJavaScriptToPython(javascriptCode)
+println(pythonCode)
